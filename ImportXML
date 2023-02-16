@@ -1,0 +1,35 @@
+USE Library
+GO
+
+CREATE TABLE XMLwithOpenXML
+(
+Id INT IDENTITY PRIMARY KEY,
+XMLData XML,
+LoadedDateTime DATETIME
+)
+
+INSERT INTO XMLwithOpenXML(XMLData, LoadedDateTime)
+SELECT CONVERT(XML, BulkColumn) AS BulkColumn, GETDATE() 
+FROM OPENROWSET(BULK 'C:\Users\federico.babbini\Desktop\Database.xml', SINGLE_BLOB) AS x;
+
+SELECT * FROM XMLwithOpenXML;
+
+
+DECLARE @XML AS XML, @hDoc AS INT, @SQL NVARCHAR (MAX)
+
+SELECT @XML = XMLData FROM XMLwithOpenXML
+
+EXEC sp_xml_preparedocument @hDoc OUTPUT, @XML
+
+SELECT UserId, Role, Username, Password
+FROM OPENXML(@hDoc, 'Library/Users/User')
+WITH 
+(
+UserId [int] '@UserId',
+Role [varchar](100) '@Role',
+Username [varchar](100) '@Username',
+Password [varchar](100) '@Password'
+)
+
+EXEC sp_xml_removedocument @hDoc
+GO
