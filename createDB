@@ -1,0 +1,9 @@
+CREATE DATABASE Library
+
+Use Library
+CREATE TABLE User
+(UserID int ,
+Role varchar(100),
+Username varchar(100),
+Password varchar(100)
+)
